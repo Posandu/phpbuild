@@ -1,3 +1,6 @@
+/**
+ * Import the stuff
+ */
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
@@ -9,8 +12,10 @@ import CleanCSS from "clean-css";
 import esbuild from "esbuild";
 import md5File from "md5-file";
 
+/** Save __dirname */
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/** The task() function */
 const task = (name, fun) => {
 	const startTime = performance.now();
 
@@ -31,6 +36,7 @@ const task = (name, fun) => {
 	);
 };
 
+/** Constants */
 const srcDir = path.join(__dirname, "src");
 const distDir = path.join(__dirname, "dist");
 
@@ -45,6 +51,7 @@ const clean = () => {
 	fs.emptyDirSync(distDir);
 };
 
+/** hash a file */
 const hashFile = (file) => md5File.sync(file);
 
 const compile_scss = () => {
@@ -148,6 +155,7 @@ const copy_php_to_dist = () => {
 	});
 };
 
+/** Run the tasks */
 task("clean", clean);
 task("compile scss", compile_scss);
 task("compile js", compile_js);
