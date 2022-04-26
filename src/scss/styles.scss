@@ -1,0 +1,19 @@
+@import "ignored";
+
+*,
+::before,
+::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: inherit;
+}
+
+body {
+	font-family: sans-serif;
+	padding: 20px;
+}
+
+.error {
+	color: $color;
+}
