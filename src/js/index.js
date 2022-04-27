@@ -1,3 +1,6 @@
-import { a } from "./_testing.js.modules.js";
+import _ from "underscore";
+const $ = (el) => document.querySelector(el);
 
-console.log("testing!!1" + a(1));
+$("#test").onclick = () => {
+	$("#test").innerHTML = _.map([1, 2, 3], (n) => n * 2).join(", ");
+};

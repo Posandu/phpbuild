@@ -1,48 +1,45 @@
 /**
  * The watcher 👀
  */
-import nodemon from "nodemon";
+import chokidar from "chokidar";
+import path from "path";
+import express from "express";
 import chalk from "chalk";
-import { WebSocketServer } from "ws";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { run } from "./index.js";
 
-const PORT = 5426;
+import { hashElement } from "folder-hash";
 
-nodemon({
-	script: "index.js",
-	ext: "js json scss css html png jpg jpeg svg php",
-	watch: "src",
-});
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const srcDir = path.join(__dirname, "src");
 
-const wss = new WebSocketServer({ port: PORT });
+const app = express();
+const port = 5426;
 
-async function createWS() {
+let sendData = "";
+
+const getHash = async () => {
 	return new Promise((resolve, reject) => {
-		wss.on("connection", function connection(ws) {
-			console.log(chalk.red("WebSocket connected"));
-			return resolve(ws);
+		hashElement(srcDir, {
+			algorithm: "md5",
+			encoding: "hex",
+		}).then((hash) => {
+			resolve(hash);
 		});
 	});
-}
-
-const sock = await createWS();
-
-const look = () => {
-	console.log(chalk.red("Watching for changes..."));
-	sock.send("reset");
 };
 
-look();
+app.get("/", (req, res) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+	res.header("Access-Control-Allow-Headers", "Content-Type");
+	res.send(sendData);
+});
 
-nodemon
-	.on("start", function () {
-		console.log(chalk.green("Watching has started..."));
-		look();
-	})
-	.on("quit", function () {
-		console.log(chalk.green("Watching has stopped..."));
-		process.exit();
-	})
-	.on("restart", function (files) {
-		console.log(chalk.green("Restarting..."));
-		look();
-	});
+app.listen(port, () => {});
+
+chokidar.watch(srcDir).on("change", async (event, path) => {
+	sendData = await getHash();
+	run();
+});

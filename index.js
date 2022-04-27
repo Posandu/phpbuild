@@ -12,6 +12,8 @@ import CleanCSS from "clean-css";
 import esbuild from "esbuild";
 import md5File from "md5-file";
 
+const production = false;
+
 /** Save __dirname */
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -72,19 +74,21 @@ const compile_scss = () => {
 		const hash = hashFile(scssFile).substring(0, 8);
 
 		let result = sass.compile(scssFile);
-		result = new CleanCSS().minify(result.css);
+		const _res = result.css.toString();
+		result = _res;
+		if (production) result = new CleanCSS().minify(result);
 
 		const cssFile = path.join(distDir, `${hash}.css`);
 
 		try {
 			// Create the CSS file
-			fs.writeFileSync(cssFile, `/* ${hash}.css */ \n ${result.styles}`);
+			fs.writeFileSync(cssFile, `/* ${hash}.css */ \n ${result}`);
 
 			console.log(chalk.green(`${chalk.gray(file + " compiled")} ${hash}`));
 		} catch (error) {}
 
 		// If the file is empty, delete it
-		if (result.styles.length === 0) {
+		if (result.length === 0) {
 			console.log(chalk.yellow(`${scssFile} output is empty`));
 			fs.unlinkSync(cssFile);
 		}
@@ -93,6 +97,14 @@ const compile_scss = () => {
 
 const compile_js = () => {
 	jsFiles.forEach((file) => {
+		// Check if directory
+		if (fs.lstatSync(path.join(jsDir, file)).isDirectory()) {
+			// If the directory name is node_modules, ignore it
+			if (file === "node_modules") {
+				return;
+			}
+		}
+
 		// Ignore files that don't end in .js
 		if (!file.endsWith(".js")) {
 			console.log(chalk.yellow(`Ignoring ${file}`));
@@ -116,8 +128,8 @@ const compile_js = () => {
 			esbuild.build({
 				bundle: true,
 				outfile: jsFileDist,
-				minify: true,
-				sourcemap: false,
+				minify: production,
+				sourcemap: !production,
 				entryPoints: [jsFile],
 			});
 
@@ -139,6 +151,7 @@ const copy_public_to_dist = () => {
 const copy_php_to_dist = () => {
 	fs.copySync(path.join(srcDir, "php"), distDir);
 	const files = fs.readdirSync(path.join(srcDir, "php"));
+
 	files.forEach((file) => {
 		if (file.endsWith(".php")) {
 			// Minify the PHP file
@@ -149,15 +162,34 @@ const copy_php_to_dist = () => {
 			const hash = hashFile(phpFile);
 
 			let newcontent = `<?php /* ${hash} */ ?> \n ${php}`;
+			if (production) {
+				// Replace all content between /* @phpbuild remove */ and /* @phpbuild remove end */
+				newcontent = newcontent.replace(
+					/\/\*\s*@phpbuild remove\s*\*\/[\s\S]*\/\*\s*@phpbuild remove end\s*\*\//g,
+					""
+				);
 
+				// Replace hot_reload() with a hash
+				newcontent = newcontent.replace(/hot_reload\(\);/g, ``);
+
+				// Replace empty <?php ?> tags
+				newcontent = newcontent.replace(/<\?php\s*\?>/g, "");
+
+				// replace ?>(Any amout of blank space chars including newline)<?php with nothing
+				newcontent = newcontent.replace(/\?>\s*<\?php/g, "");
+			}
 			fs.writeFileSync(phpFileDist, newcontent);
 		}
 	});
 };
 
 /** Run the tasks */
-task("clean", clean);
-task("compile scss", compile_scss);
-task("compile js", compile_js);
-task("copy public to dist", copy_public_to_dist);
-task("copy php to dist", copy_php_to_dist);
+export function run() {
+	task("clean", clean);
+	task("compile scss", compile_scss);
+	task("compile js", compile_js);
+	task("copy public to dist", copy_public_to_dist);
+	task("copy php to dist", copy_php_to_dist);
+}
+
+run();
