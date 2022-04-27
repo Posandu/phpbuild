@@ -1,4 +1,4 @@
-<?php /* 3bf5f78c3722765e4905d3f4a306673a */  
+<?php /* 877a387f61fb3d947e0f432b72f44a1a */  
 include "utils.php";
 ?>
 <!DOCTYPE html>
@@ -9,7 +9,7 @@ include "utils.php";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <?= scss_file("styles") ?>
+    <link rel="stylesheet" href="65fd4fb8.css" />
 </head>
 
 <body>
@@ -24,10 +24,7 @@ include "utils.php";
         Click me!
     </button>
     
-    <?php
-    
-    js_file("index");
-    ?>
+    <script src="7c5a50e7.js"></script>
 </body>
 
 </html>
