@@ -1,2 +1,16 @@
 /* 68c45fa9.css */ 
- undefined
+ *,
+::before,
+::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+body {
+  background-color: rgb(4, 39, 59);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  color: white;
+}

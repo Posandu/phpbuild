@@ -56,6 +56,11 @@ const clean = () => {
 /** hash a file */
 const hashFile = (file) => md5File.sync(file);
 
+const css_to_scss = (file) => {
+	const res = sass.compile(file);
+	return res.css.toString();
+};
+
 const compile_scss = () => {
 	scssFiles.forEach((file) => {
 		// Ignore files that don't end in .scss
@@ -73,22 +78,26 @@ const compile_scss = () => {
 
 		const hash = hashFile(scssFile).substring(0, 8);
 
-		let result = sass.compile(scssFile);
-		const _res = result.css.toString();
-		result = _res;
-		if (production) result = new CleanCSS().minify(_res);
+		let result = css_to_scss(scssFile);
+
+		if (production) {
+			result = new CleanCSS().minify(result);
+		}
 
 		const cssFile = path.join(distDir, `${hash}.css`);
 
 		try {
 			// Create the CSS file
-			fs.writeFileSync(cssFile, `/* ${hash}.css */ \n ${result.styles}`);
+			fs.writeFileSync(
+				cssFile,
+				`/* ${hash}.css */ \n ${production ? result.styles : result}`
+			);
 
 			console.log(chalk.green(`${chalk.gray(file + " compiled")} ${hash}`));
 		} catch (error) {}
 
 		// If the file is empty, delete it
-		if (result.length < 1) {
+		if (result < 1) {
 			console.log(chalk.yellow(`${scssFile} output is empty`));
 			fs.unlinkSync(cssFile);
 		}
