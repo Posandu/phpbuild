@@ -4,7 +4,6 @@
 import chokidar from "chokidar";
 import path from "path";
 import express from "express";
-import chalk from "chalk";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { run } from "./index.js";

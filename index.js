@@ -12,7 +12,7 @@ import CleanCSS from "clean-css";
 import esbuild from "esbuild";
 import md5File from "md5-file";
 
-const production = false;
+const production = process.argv.slice(2)[0] === "--production" ? true : false;
 
 /** Save __dirname */
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -40,7 +40,7 @@ const task = (name, fun) => {
 
 /** Constants */
 const srcDir = path.join(__dirname, "src");
-const distDir = path.join(__dirname, "dist");
+const distDir = path.join(__dirname, production ? "build" : "dist");
 
 const scssDir = path.join(srcDir, "scss");
 const scssFiles = fs.readdirSync(scssDir);
@@ -76,19 +76,19 @@ const compile_scss = () => {
 		let result = sass.compile(scssFile);
 		const _res = result.css.toString();
 		result = _res;
-		if (production) result = new CleanCSS().minify(result);
+		if (production) result = new CleanCSS().minify(_res);
 
 		const cssFile = path.join(distDir, `${hash}.css`);
 
 		try {
 			// Create the CSS file
-			fs.writeFileSync(cssFile, `/* ${hash}.css */ \n ${result}`);
+			fs.writeFileSync(cssFile, `/* ${hash}.css */ \n ${result.styles}`);
 
 			console.log(chalk.green(`${chalk.gray(file + " compiled")} ${hash}`));
 		} catch (error) {}
 
 		// If the file is empty, delete it
-		if (result.length === 0) {
+		if (result.length < 1) {
 			console.log(chalk.yellow(`${scssFile} output is empty`));
 			fs.unlinkSync(cssFile);
 		}
