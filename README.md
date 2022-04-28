@@ -59,9 +59,6 @@ Run the build process and hot reload process.
 ### `pnpm run build`
 Build the project. All the build files will be generated in the `build` directory.
 
-## Debugging
-### `Hot reload failed. Please make sure you have a server running on port 5426.`
-
 ## PHP API
 Now if you go to the `src/php` directory, you should see the following:
 
@@ -107,6 +104,9 @@ src/scss/
 
 Then we can use `scss_file("index")` to include the `index.scss` file. All files starting with `_` will be ignored. And if we try to include a file that doesn't exist, we will get an error.
 
+## Debugging
+
+### `Hot reload failed. Please make sure you have a server running on port 5426.`
 ![image](https://user-images.githubusercontent.com/76736580/165697714-ca811172-67cd-4739-b246-3be21e739fc0.png)
 
 Make sure to run `pnpm run dev` in the project directory.
