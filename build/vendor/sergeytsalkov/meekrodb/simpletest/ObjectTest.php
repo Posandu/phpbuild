@@ -1,4 +1,4 @@
-<?php
+<?php /* 083c447a3022a156d4017bf676596977 */ 
 class ObjectTest extends SimpleTest {
   public $mdb;
   

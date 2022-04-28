@@ -1,4 +1,4 @@
-<?php
+<?php /* a082677f942762225c7299c668223ad1 */ 
 
 function my_error_handler($hash) {
   global $error_callback_worked;

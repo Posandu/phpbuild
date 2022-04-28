@@ -1,4 +1,4 @@
-<?php return array(
+<?php /* 303b436a1ecf0fb104478dacfa03b933 */  return array(
     'root' => array(
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',

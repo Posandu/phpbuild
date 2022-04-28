@@ -1,4 +1,4 @@
-<?php
+<?php /* 179bad28e4f5f786153afe2c14b18ddd */ 
 
 class WalkTest extends SimpleTest {
   function test_1_walk() {

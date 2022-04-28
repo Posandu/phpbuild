@@ -1,4 +1,4 @@
-<?php
+<?php /* be55d8a0af8827ad0f447e00e35ebcd6 */ 
 class WhereClauseTest extends SimpleTest {
   function test_1_basic_where() {
     $where = new WhereClause('and');

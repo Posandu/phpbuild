@@ -1,4 +1,4 @@
-<?php
+<?php /* 4e0a473b609c8e322d9dc92f969d7fee */ 
 class CallTest extends SimpleTest {
   function test_1_create_procedure() {
     DB::query("DROP PROCEDURE IF EXISTS myProc");

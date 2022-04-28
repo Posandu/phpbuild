@@ -1,4 +1,4 @@
-<?php
+<?php /* 13254260fa6ca288ff022795cee909a1 */ 
 class BasicTest extends SimpleTest {
   function __construct() {
     foreach (DB::tableList() as $table) {

@@ -1,4 +1,4 @@
-<?php
+<?php /* 09e83251bf98feee79a96b6130a24938 */ 
 /*
     Copyright (C) 2008 Sergey Tsalkov (stsalkov@gmail.com)
 

@@ -1,4 +1,5 @@
-#!/usr/bin/php
+<?php /* 50690abf49db67703ee24079bd955a7d */ ?> 
+ #!/usr/bin/php
 <?php
 class SimpleTest {
   public function assert($boolean) {

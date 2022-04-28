@@ -11,6 +11,7 @@ import sass from "sass";
 import CleanCSS from "clean-css";
 import esbuild from "esbuild";
 import md5File from "md5-file";
+import glob from "glob";
 
 const production = process.argv.slice(2)[0] === "--production" ? true : false;
 
@@ -159,105 +160,117 @@ const copy_public_to_dist = () => {
 
 const copy_php_to_dist = () => {
 	fs.copySync(path.join(srcDir, "php"), distDir);
-	// Get all files including files in subdirectories
 
-	files.forEach((file) => {
-		console.log(file);
-		if (file.endsWith(".php")) {
-			const phpFile = path.join(srcDir, "php", file);
-			const phpFileDist = path.join(distDir, file);
+	glob(
+		`**/${production ? "build" : "dist"}/**`,
+		{
+			dot: true,
+		},
+		(_, files) => {
+			files.forEach((file) => {
+				console.log(file);
 
-			const php = fs.readFileSync(phpFile, "utf8");
-			const hash = hashFile(phpFile);
+				if (file.endsWith(".php")) {
+					let split = file.split("/");
+					// Remove the first element
+					split.shift();
 
-			let newcontent = `<?php /* ${hash} */ ?> \n ${php}`;
+					const phpFile = path.join(srcDir, "php", split.join("/"));
+					const phpFileDist = file;
 
-			if (production) {
-				// get all js_file() calls and their values
-				const js_files = newcontent.match(/js_file\((.*)\);/g);
+					const php = fs.readFileSync(phpFile, "utf8");
+					const hash = hashFile(phpFile);
 
-				// replace all js_file() calls with the hash of the file
-				if (js_files) {
-					let newcontentI = newcontent;
+					let newcontent = `<?php /* ${hash} */ ?> \n ${php}`;
 
-					js_files.forEach((js_file) => {
-						// Get all stuff inside the single quotes or double quotes
-						const file = js_file.match(/'(.*)'|"(.*)"/g);
-						if (file) {
-							// Get the file name
-							const fileName = file[0].replace(/['"]+/g, "");
+					if (production) {
+						// get all js_file() calls and their values
+						const js_files = newcontent.match(/js_file\((.*)\);/g);
 
-							if (fileName) {
-								// Replace the js_file() call with the hash of the file
-								newcontentI = newcontentI.replace(
-									js_file,
-									`
+						// replace all js_file() calls with the hash of the file
+						if (js_files) {
+							let newcontentI = newcontent;
+
+							js_files.forEach((js_file) => {
+								// Get all stuff inside the single quotes or double quotes
+								const file = js_file.match(/'(.*)'|"(.*)"/g);
+								if (file) {
+									// Get the file name
+									const fileName = file[0].replace(/['"]+/g, "");
+
+									if (fileName) {
+										// Replace the js_file() call with the hash of the file
+										newcontentI = newcontentI.replace(
+											js_file,
+											`
 									?><script src="${hashFile(path.join(jsDir, fileName + ".js")).substring(
 										0,
 										8
 									)}.js"></script><?php
 									`
-								);
-							}
+										);
+									}
+								}
+							});
+
+							newcontent = newcontentI;
 						}
-					});
 
-					newcontent = newcontentI;
-				}
+						// get all scss_file() calls and their values
+						const scss_files = newcontent.match(/scss_file\((.*)\);/g);
 
-				// get all scss_file() calls and their values
-				const scss_files = newcontent.match(/scss_file\((.*)\);/g);
+						// replace all scss_file() calls with the hash of the file
+						if (scss_files) {
+							let newcontentI = newcontent;
 
-				// replace all scss_file() calls with the hash of the file
-				if (scss_files) {
-					let newcontentI = newcontent;
+							scss_files.forEach((scss_file) => {
+								// Get all stuff inside the single quotes or double quotes
+								const file = scss_file.match(/'(.*)'|"(.*)"/g);
+								if (file) {
+									// Get the file name
+									const fileName = file[0].replace(/['"]+/g, "");
 
-					scss_files.forEach((scss_file) => {
-						// Get all stuff inside the single quotes or double quotes
-						const file = scss_file.match(/'(.*)'|"(.*)"/g);
-						if (file) {
-							// Get the file name
-							const fileName = file[0].replace(/['"]+/g, "");
-
-							if (fileName) {
-								// Replace the scss_file() call with the hash of the file
-								newcontentI = newcontentI.replace(
-									scss_file,
-									`
+									if (fileName) {
+										// Replace the scss_file() call with the hash of the file
+										newcontentI = newcontentI.replace(
+											scss_file,
+											`
 									?><link rel="stylesheet" href="${hashFile(
 										path.join(scssDir, fileName + ".scss")
 									).substring(0, 8)}.css" /><?php
 									`
-								);
-							}
+										);
+									}
+								}
+							});
+
+							newcontent = newcontentI;
 						}
-					});
 
-					newcontent = newcontentI;
+						// Replace all content between /* @phpbuild remove */ and /* @phpbuild remove end */
+						newcontent = newcontent.replace(
+							/\/\*\s*@phpbuild remove\s*\*\/[\s\S]*\/\*\s*@phpbuild remove end\s*\*\//g,
+							""
+						);
+
+						// Replace hot_reload() with a hash
+						newcontent = newcontent.replace(/hot_reload\(\);/g, ``);
+
+						// Replace empty <?php ?> tags
+						newcontent = newcontent.replace(/<\?php\s*\?>/g, "");
+
+						// replace ?>(Any amout of blank space chars including newline)<?php with nothing
+						newcontent = newcontent.replace(/\?>\s*<\?php/g, "");
+
+						// replace <?=(Any amout of blank space chars including newline)?> with nothing
+						newcontent = newcontent.replace(/<\?=\s*\?>/g, "");
+					}
+
+					fs.writeFileSync(phpFileDist, newcontent);
 				}
-
-				// Replace all content between /* @phpbuild remove */ and /* @phpbuild remove end */
-				newcontent = newcontent.replace(
-					/\/\*\s*@phpbuild remove\s*\*\/[\s\S]*\/\*\s*@phpbuild remove end\s*\*\//g,
-					""
-				);
-
-				// Replace hot_reload() with a hash
-				newcontent = newcontent.replace(/hot_reload\(\);/g, ``);
-
-				// Replace empty <?php ?> tags
-				newcontent = newcontent.replace(/<\?php\s*\?>/g, "");
-
-				// replace ?>(Any amout of blank space chars including newline)<?php with nothing
-				newcontent = newcontent.replace(/\?>\s*<\?php/g, "");
-
-				// replace <?=(Any amout of blank space chars including newline)?> with nothing
-				newcontent = newcontent.replace(/<\?=\s*\?>/g, "");
-			}
-
-			fs.writeFileSync(phpFileDist, newcontent);
+			});
 		}
-	});
+	);
 
 	if (production) {
 		// replace content in utils.php

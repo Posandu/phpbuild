@@ -1,4 +1,4 @@
-<?php
+<?php /* 35d60a74c066821c68c9192429020d46 */ 
 class TransactionTest_55 extends SimpleTest {
   function test_1_transactions() {
     DB::$nested_transactions = true;
