@@ -162,7 +162,7 @@ const copy_php_to_dist = () => {
 	fs.copySync(path.join(srcDir, "php"), distDir);
 
 	glob(
-		`**/${production ? "build" : "dist"}/**`,
+		`${production ? "build" : "dist"}/**`,
 		{
 			dot: true,
 		},
