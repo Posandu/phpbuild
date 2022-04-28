@@ -1,4 +1,4 @@
-<?php /* 3bf5f78c3722765e4905d3f4a306673a */ ?> 
+<?php /* 877a387f61fb3d947e0f432b72f44a1a */ ?> 
  <?php 
 include "utils.php";
 ?>
@@ -10,7 +10,7 @@ include "utils.php";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <?= scss_file("styles") ?>
+    <?= scss_file("styles"); ?>
 </head>
 
 <body>

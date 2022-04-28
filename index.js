@@ -159,9 +159,10 @@ const copy_public_to_dist = () => {
 
 const copy_php_to_dist = () => {
 	fs.copySync(path.join(srcDir, "php"), distDir);
-	const files = fs.readdirSync(path.join(srcDir, "php"));
+	// Get all files including files in subdirectories
 
 	files.forEach((file) => {
+		console.log(file);
 		if (file.endsWith(".php")) {
 			const phpFile = path.join(srcDir, "php", file);
 			const phpFileDist = path.join(distDir, file);
@@ -234,38 +235,38 @@ const copy_php_to_dist = () => {
 
 					newcontent = newcontentI;
 				}
+
+				// Replace all content between /* @phpbuild remove */ and /* @phpbuild remove end */
+				newcontent = newcontent.replace(
+					/\/\*\s*@phpbuild remove\s*\*\/[\s\S]*\/\*\s*@phpbuild remove end\s*\*\//g,
+					""
+				);
+
+				// Replace hot_reload() with a hash
+				newcontent = newcontent.replace(/hot_reload\(\);/g, ``);
+
+				// Replace empty <?php ?> tags
+				newcontent = newcontent.replace(/<\?php\s*\?>/g, "");
+
+				// replace ?>(Any amout of blank space chars including newline)<?php with nothing
+				newcontent = newcontent.replace(/\?>\s*<\?php/g, "");
+
+				// replace <?=(Any amout of blank space chars including newline)?> with nothing
+				newcontent = newcontent.replace(/<\?=\s*\?>/g, "");
 			}
-
-			// Replace all content between /* @phpbuild remove */ and /* @phpbuild remove end */
-			newcontent = newcontent.replace(
-				/\/\*\s*@phpbuild remove\s*\*\/[\s\S]*\/\*\s*@phpbuild remove end\s*\*\//g,
-				""
-			);
-
-			// Replace hot_reload() with a hash
-			newcontent = newcontent.replace(/hot_reload\(\);/g, ``);
-
-			// Replace empty <?php ?> tags
-			newcontent = newcontent.replace(/<\?php\s*\?>/g, "");
-
-			// replace ?>(Any amout of blank space chars including newline)<?php with nothing
-			newcontent = newcontent.replace(/\?>\s*<\?php/g, "");
-
-			// replace <?=(Any amout of blank space chars including newline)?> with nothing
-			newcontent = newcontent.replace(/<\?=\s*\?>/g, "");
 
 			fs.writeFileSync(phpFileDist, newcontent);
 		}
 	});
 
-	if(production) {
+	if (production) {
 		// replace content in utils.php
 		const phpFile = path.join(distDir, "utils.php");
 		const php = fs.readFileSync(phpFile, "utf8");
 		const hash = hashFile(phpFile);
 
 		let newcontent = `<?php /* ${hash} */`;
-	
+
 		fs.writeFileSync(phpFile, newcontent);
 	}
 };
