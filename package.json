@@ -25,6 +25,7 @@
 		"sass": "^1.50.1"
 	},
 	"dependencies": {
+		"sweetalert2": "^11.4.9",
 		"underscore": "^1.13.3"
 	}
 }

@@ -11,9 +11,11 @@ specifiers:
   glob: ^8.0.1
   md5-file: ^5.0.0
   sass: ^1.50.1
+  sweetalert2: ^11.4.9
   underscore: ^1.13.3
 
 dependencies:
+  sweetalert2: 11.4.9
   underscore: 1.13.3
 
 devDependencies:
@@ -834,6 +836,10 @@ packages:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
     dev: true
+
+  /sweetalert2/11.4.9:
+    resolution: {integrity: sha512-DAQGODShPfz9cwxDIUuXZuavlq1kOR2uypXa4DxG9YxlIbcCSlbm7BEnXwP/GK9+wI+whvj5iePEByq3RbIoNg==}
+    dev: false
 
   /to-regex-range/5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}

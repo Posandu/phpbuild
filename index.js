@@ -168,20 +168,16 @@ const copy_php_to_dist = () => {
 		},
 		(_, files) => {
 			files.forEach((file) => {
-				console.log(file);
-
 				if (file.endsWith(".php")) {
 					let split = file.split("/");
-					// Remove the first element
 					split.shift();
 
 					const phpFile = path.join(srcDir, "php", split.join("/"));
 					const phpFileDist = file;
 
 					const php = fs.readFileSync(phpFile, "utf8");
-					const hash = hashFile(phpFile);
 
-					let newcontent = `<?php /* ${hash} */ ?> \n ${php}`;
+					let newcontent = `${php}`;
 
 					if (production) {
 						// get all js_file() calls and their values
@@ -269,28 +265,31 @@ const copy_php_to_dist = () => {
 					fs.writeFileSync(phpFileDist, newcontent);
 				}
 			});
+
+			if (production) {
+				// replace content in utils.php
+				const phpFile = path.join(distDir, "utils.php");
+				const hash = hashFile(phpFile);
+
+				let newcontent = ``;
+
+				fs.writeFileSync(phpFile, newcontent);
+			}
 		}
 	);
-
-	if (production) {
-		// replace content in utils.php
-		const phpFile = path.join(distDir, "utils.php");
-		const php = fs.readFileSync(phpFile, "utf8");
-		const hash = hashFile(phpFile);
-
-		let newcontent = `<?php /* ${hash} */`;
-
-		fs.writeFileSync(phpFile, newcontent);
-	}
 };
 
 /** Run the tasks */
 export function run() {
-	task("clean", clean);
-	task("compile scss", compile_scss);
-	task("compile js", compile_js);
-	task("copy public to dist", copy_public_to_dist);
-	task("copy php to dist", copy_php_to_dist);
+	const runReally = () => {
+		task("clean", clean);
+		task("compile scss", compile_scss);
+		task("compile js", compile_js);
+		task("copy public to dist", copy_public_to_dist);
+		task("copy php to dist", copy_php_to_dist);
+	};
+
+	task("build", runReally);
 }
 
 run();
