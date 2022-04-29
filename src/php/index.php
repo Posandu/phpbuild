@@ -1,5 +1,5 @@
-<?
-include "utils.php";
+<?php
+require "utils.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
