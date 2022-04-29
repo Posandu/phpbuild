@@ -23,9 +23,5 @@
 		"glob": "^8.0.1",
 		"md5-file": "^5.0.0",
 		"sass": "^1.50.1"
-	},
-	"dependencies": {
-		"sweetalert2": "^11.4.9",
-		"underscore": "^1.13.3"
 	}
 }

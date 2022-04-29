@@ -1,9 +1,5 @@
-<?php
-require_once("db.php");
+<?
 include "utils.php";
-
-
-$todos = DB::query("SELECT * FROM todos");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,19 +19,6 @@ $todos = DB::query("SELECT * FROM todos");
     <p>
         Edit <code>src/php/index.php</code> and see the changes reflected here.
     </p>
-
-    <h2>
-        Todo app
-    </h2>
-
-    <div class="flex">
-        <input type="text" class="input" id="title" placeholder="Todo title">
-        <button id="add">
-            Add todo
-        </button>
-    </div>
-
-    <div id="todos"></div>
 
     <?php
     hot_reload();
