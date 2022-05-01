@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "node index.js --production",
-		"dev": "node watch.js"
+		"build": "node compiler/index.js --production",
+		"dev": "node compiler/watch.js"
 	},
 	"keywords": [],
 	"author": "",

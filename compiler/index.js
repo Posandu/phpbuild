@@ -4,8 +4,6 @@
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
 
 import sass from "sass";
 import CleanCSS from "clean-css";
@@ -13,33 +11,21 @@ import esbuild from "esbuild";
 import md5File from "md5-file";
 import glob from "glob";
 
+import task from "./task.js";
+
+/**
+ * Check if production mode
+ */
 const production = process.argv.slice(2)[0] === "--production" ? true : false;
 
-/** Save __dirname */
-const __dirname = dirname(fileURLToPath(import.meta.url));
+/**
+ * Save __dirname for later use
+ */
+const __dirname = "./";
 
-/** The task() function */
-const task = (name, fun) => {
-	const startTime = performance.now();
-
-	console.log(chalk.green(`${name} started`));
-
-	try {
-		fun();
-	} catch (e) {
-		console.log(chalk.red(`${name} failed`));
-		console.log(e);
-		return;
-	}
-
-	console.log(
-		chalk.green(
-			`${name} done in ${(performance.now() - startTime).toFixed(2)}ms`
-		)
-	);
-};
-
-/** Constants */
+/**
+ * Constants
+ */
 const srcDir = path.join(__dirname, "src");
 const distDir = path.join(__dirname, production ? "build" : "dist");
 
@@ -49,19 +35,35 @@ const scssFiles = fs.readdirSync(scssDir);
 const jsDir = path.join(srcDir, "js");
 const jsFiles = fs.readdirSync(jsDir);
 
-// delete all files in the dist directory
+/**
+ * Cleans the dist directory
+ * @returns {void}
+ */
 const clean = () => {
 	fs.emptyDirSync(distDir);
 };
 
-/** hash a file */
+/**
+ * Hash a file
+ * @param {file} file 
+ * @returns {String} Hash of the file
+ */
 const hashFile = (file) => md5File.sync(file);
 
+/**
+ * Compile SCSS to CSS
+ * @param {file} SCSS file 
+ * @returns {String} CSS
+ */
 const css_to_scss = (file) => {
 	const res = sass.compile(file);
 	return res.css.toString();
 };
 
+/**
+ * The Main function to compile the SCSS files
+ * @returns {void}
+ */
 const compile_scss = () => {
 	scssFiles.forEach((file) => {
 		// Ignore files that don't end in .scss
@@ -69,6 +71,7 @@ const compile_scss = () => {
 			console.log(chalk.yellow(`Ignoring ${file}`));
 			return;
 		}
+		
 		// If the file name starts with an underscore, ignore it
 		if (file.charAt(0) === "_") {
 			return;
@@ -81,6 +84,9 @@ const compile_scss = () => {
 
 		let result = css_to_scss(scssFile);
 
+		/**
+		 * Minify in production
+		 */
 		if (production) {
 			result = new CleanCSS().minify(result);
 		}
@@ -105,6 +111,10 @@ const compile_scss = () => {
 	});
 };
 
+/**
+ * Compile JS
+ * @returns {void}
+ */
 const compile_js = () => {
 	jsFiles.forEach((file) => {
 		// Check if directory
@@ -154,10 +164,18 @@ const compile_js = () => {
 	});
 };
 
+/**
+ * Copy the files in the public directory to the dist directory
+ * @returns {void}
+ */
 const copy_public_to_dist = () => {
 	fs.copySync(path.join(srcDir, "public"), distDir);
 };
 
+/**
+ * Copy and optimize the PHP files in the src directory to the dist directory
+ * @returns {void}
+ */
 const copy_php_to_dist = () => {
 	fs.copySync(path.join(srcDir, "php"), distDir);
 
@@ -269,7 +287,6 @@ const copy_php_to_dist = () => {
 			if (production) {
 				// replace content in utils.php
 				const phpFile = path.join(distDir, "utils.php");
-				const hash = hashFile(phpFile);
 
 				let newcontent = ``;
 
@@ -279,7 +296,10 @@ const copy_php_to_dist = () => {
 	);
 };
 
-/** Run the tasks */
+/**
+ * Runs the build process, builds the site.
+ * @return {void}
+ */
 export function run() {
 	const runReally = () => {
 		task("clean", clean);

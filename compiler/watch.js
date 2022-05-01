@@ -4,13 +4,11 @@
 import chokidar from "chokidar";
 import path from "path";
 import express from "express";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
 import { run } from "./index.js";
 
 import { hashElement } from "folder-hash";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = "./";
 const srcDir = path.join(__dirname, "src");
 
 const app = express();
