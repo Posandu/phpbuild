@@ -48,7 +48,7 @@ php -S 0.0.0.0:8624
 
 Now open [http://localhost:8624/](http://localhost:8624/) in your browser. You should see the following:
 
-![image](https://user-images.githubusercontent.com/76736580/165697265-62d10093-3f95-45d3-ba37-d0f154312399.png)
+![image](https://user-images.githubusercontent.com/76736580/166134295-0603855b-d265-4582-b6bf-303173fb8d64.png)
 
 If you see the following, you have successfully installed PHPbuild. Now try editing the `index.php` file and see what happens. The page should be reloaded automatically.
 
